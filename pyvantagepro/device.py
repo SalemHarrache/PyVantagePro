@@ -63,13 +63,20 @@ class VantagePro2(object):
     ESC = '\x1b'
     OK = '\n\rOK\n\r'
 
-    def __init__(self, link):
+    RAIN_COLLECTOR_UNITS = {
+        0x00: 0.01, # inch
+        0x10: 0.2,  # millimeter
+        0x20: 0.1,  # millimeter
+    }
+
+    def __init__(self, link, rain_collector_unit=0.01):
         self.link = link
         self.link.open()
+        self.rain_collector_unit = rain_collector_unit
         self._check_revision()
 
     @classmethod
-    def from_url(cls, url, timeout=10):
+    def from_url(cls, url, timeout=10, rain_collector_unit=0.01):
         ''' Get device from url.
 
         :param url: A `PyLink` connection URL.
@@ -77,7 +84,7 @@ class VantagePro2(object):
         '''
         link = link_from_url(url)
         link.settimeout(timeout)
-        return cls(link)
+        return cls(link, rain_collector_unit)
 
     @classmethod
     def from_serial(cls, tty, baud, timeout=10):
@@ -170,7 +177,7 @@ class VantagePro2(object):
         self.send("LOOP 1", self.ACK)
         current_data = self.link.read(99)
         if self.RevB:
-            return LoopDataParserRevB(current_data, datetime.now())
+            return LoopDataParserRevB(current_data, datetime.now(), self.rain_collector_unit)
         else:
             raise NotImplementedError('Do not support RevB data format')
 
