@@ -145,20 +145,20 @@ class LoopDataParserRevB(DataParser):
         ('SunSet', 'H'), ('EOL', '2s'), ('CRC', 'H'),
     )
 
-    def __init__(self, data, dtime):
+    def __init__(self, data, dtime, rain_collector_unit=0.01):
         super(LoopDataParserRevB, self).__init__(data, self.LOOP_FORMAT)
         self['Datetime'] = dtime
         self['Barometer'] = self['Barometer'] / 1000
         self['TempIn'] = self['TempIn'] / 10
         self['TempOut'] = self['TempOut'] / 10
-        self['RainRate'] = self['RainRate'] / 100
-        self['RainStorm'] = self['RainStorm'] / 100
+        self['RainRate'] = self['RainRate'] * rain_collector_unit
+        self['RainStorm'] = self['RainStorm'] * rain_collector_unit
         # Given a packed storm date field, unpack and return date
         self['StormStartDate'] = self.unpack_storm_date()
         # rain totals
-        self['RainDay'] = self['RainDay'] / 100
-        self['RainMonth'] = self['RainMonth'] / 100
-        self['RainYear'] = self['RainYear'] / 100
+        self['RainDay'] = self['RainDay'] * rain_collector_unit
+        self['RainMonth'] = self['RainMonth'] * rain_collector_unit
+        self['RainYear'] = self['RainYear'] * rain_collector_unit
         # evapotranspiration totals
         self['ETDay'] = self['ETDay'] / 1000
         self['ETMonth'] = self['ETMonth'] / 100
